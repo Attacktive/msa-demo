@@ -1,14 +1,17 @@
 <script lang="ts">
 	import type { Product } from "$types/product";
 	import type { InboundOrder, NewOrder } from "$types/order";
-	import axios from "axios";
+	import axios, { AxiosError } from "axios";
 	import { Breadcrumb, BreadcrumbItem, Button, Table, TableBodyCell, TableBodyRow, TableHead, TableHeadCell, Toast } from "flowbite-svelte";
+	import { BellRingSolid } from "flowbite-svelte-icons";
 	import OrderProductModal from "$components/orders/OrderProductModal.svelte";
 	import EditOrderModal from "$components/orders/EditOrderModal.svelte";
 
 	let toShowToast = false;
+	let toShowToastIcon = false;
 	let toastContent = "";
-	const showToast = (content: string, durationInSeconds: number = 5) => {
+	const showToast = (content: string, toShowIcon = false, durationInSeconds = 5) => {
+		toShowToastIcon = toShowIcon;
 		toastContent = content;
 		toShowToast = true;
 		if (durationInSeconds > 0) {
@@ -16,7 +19,13 @@
 		}
 	};
 
-	const notify = (event) => showToast(event.detail);
+	const reportError = (event: CustomEvent<Error>) => {
+		if (event.detail instanceof AxiosError && event.detail.response?.data?.message) {
+			showToast(event.detail.response.data.message, true);
+		} else {
+			showToast(event.detail.message, true);
+		}
+	}
 
 	const productApiRoot = import.meta.env.VITE_PRODUCT_API_ROOT;
 	const orderApiRoot = import.meta.env.VITE_ORDER_API_ROOT;
@@ -114,8 +123,11 @@
 	<Button class="mx-3" on:click={addTestOrders}>Add test orders</Button>
 </div>
 
-<OrderProductModal bind:toShow={toShowOrderProductModal} on:submit={fetchOrders} on:notify/>
-<EditOrderModal bind:toShow={toShowEditOrderModal} orderId={currentOrderId} on:submit={fetchOrders} on:notify/>
-<Toast bind:open={toShowToast}>
+<OrderProductModal bind:toShow={toShowOrderProductModal} on:submit={fetchOrders} on:report-error={reportError}/>
+<EditOrderModal bind:toShow={toShowEditOrderModal} orderId={currentOrderId} on:submit={fetchOrders} on:report-error={reportError}/>
+<Toast class="my-5" bind:open={toShowToast}>
+	{#if toShowToastIcon}
+		<BellRingSolid slot="icon" class="w-12 h-12"/>
+	{/if}
 	{toastContent}
 </Toast>

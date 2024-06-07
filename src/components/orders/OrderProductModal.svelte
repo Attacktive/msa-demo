@@ -37,7 +37,7 @@
 	const orderProduct = () => {
 		axios.post(orderApiRoot, newOrder)
 			.then(() => dispatch("submit"))
-			.catch(error => dispatch("notify", error))
+			.catch(error => dispatch("report-error", error))
 			.finally(() => toShow = false);
 	};
 

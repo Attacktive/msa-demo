@@ -55,14 +55,14 @@
 	const editOrder = () => {
 		axios.put(`${orderApiRoot}/${orderId}`, order)
 			.then(() => dispatch("submit"))
-			.catch(error => dispatch("notify", error))
+			.catch(error => dispatch("report-error", error))
 			.finally(() => toShow = false);
 	};
 
 	const removeProduct = () => {
 		axios.delete(`${orderApiRoot}/${orderId}`)
 			.then(() => dispatch("submit"))
-			.catch(error => dispatch("notify", error))
+			.catch(error => dispatch("report-error", error))
 			.finally(() => toShow = false);
 	};
 

@@ -28,7 +28,7 @@
 	const addProduct = () => {
 		axios.post(apiRoot, newProduct)
 			.then(() => dispatch("submit"))
-			.catch(error => dispatch("notify", error))
+			.catch(error => dispatch("report-error", error))
 			.finally(() => toShow = false);
 	};
 

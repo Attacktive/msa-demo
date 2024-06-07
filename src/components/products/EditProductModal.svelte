@@ -41,14 +41,14 @@
 	const editProduct = () => {
 		axios.put(`${apiRoot}/${productId}`, product)
 			.then(() => dispatch("submit"))
-			.catch(error => dispatch("notify", error))
+			.catch(error => dispatch("report-error", error))
 			.finally(() => toShow = false);
 	};
 
 	const removeProduct = () => {
 		axios.delete(`${apiRoot}/${product.id}`)
 			.then(() => dispatch("submit"))
-			.catch(error => dispatch("notify", error))
+			.catch(error => dispatch("report-error", error))
 			.finally(() => toShow = false);
 	};
 
