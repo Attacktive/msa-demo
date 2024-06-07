@@ -1,5 +1,5 @@
 <script>
-	import { Breadcrumb, BreadcrumbItem, Button } from "flowbite-svelte";
+	import { Breadcrumb, BreadcrumbItem, Card } from "flowbite-svelte";
 </script>
 
 <main>
@@ -7,6 +7,10 @@
 		<BreadcrumbItem home>Home</BreadcrumbItem>
 	</Breadcrumb>
 
-	<Button href="products">Products</Button>
-	<Button href="orders">Order</Button>
+	<Card size="lg" class="my-4">
+		<a href="products">Products</a>
+	</Card>
+	<Card size="lg" class="my-4">
+		<a href="orders">Order</a>
+	</Card>
 </main>
