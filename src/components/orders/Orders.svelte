@@ -53,35 +53,46 @@
 	}
 
 	const addTestOrders = async () => {
-		const { data } = await axios.get<Product[]>(productApiRoot);
-		if (data.length) {
-			const orders: NewOrder[] = [
-				{
-					productId: data[0].id,
-					quantity: data[0].stock / 2
+		try {
+			const { data } = await axios.get<Product[]>(productApiRoot);
+			if (data.length) {
+				const orders: NewOrder[] = [
+					{
+						productId: data[0].id,
+						quantity: data[0].stock / 2
+					}
+				];
+
+				if (data.length > 1) {
+					const randomIndex = generateRandomInteger(1, data.length);
+
+					orders.push({
+						productId: data[randomIndex].id,
+						quantity: data[randomIndex].stock / 3
+					});
 				}
-			];
 
-			if (data.length > 1) {
-				const randomIndex = generateRandomInteger(1, data.length);
-
-				orders.push({
-					productId: data[randomIndex].id,
-					quantity: data[randomIndex].stock / 3
-				});
+				const requests = orders.map(order => axios.post(orderApiRoot, order));
+				axios.all(requests).then(fetchOrders);
+			} else {
+				showToast("No product is available now. 😞");
 			}
-
-			const requests = orders.map(order => axios.post(orderApiRoot, order));
-			axios.all(requests).then(fetchOrders);
-		} else {
-			showToast("No product is available now. 😞");
+		} catch (error) {
+			if (error instanceof AxiosError && error.response?.data.message) {
+				showToast(error.response.data.message, true);
+			} else if (error instanceof Error) {
+				showToast(error.message);
+			} else {
+				console.error(error);
+			}
 		}
 	};
 
 	const removeOrder = (orderId: number) => {
 		if (confirm(`Are you sure you want to delete the order #${orderId}?`)) {
 			axios.delete(`${orderApiRoot}/${orderId}`)
-				.then(fetchOrders);
+				.then(fetchOrders)
+				.catch(error => showToast(error.response.data.message, true));
 		}
 	}
 

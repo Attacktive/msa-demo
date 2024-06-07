@@ -75,13 +75,16 @@
 		];
 
 		const requests = products.map(product => axios.post(apiRoot, product))
-		axios.all(requests).then(fetchProducts);
+		axios.all(requests)
+			.then(fetchProducts)
+			.catch(error => showToast(error.response.data.message, true));
 	};
 
 	const removeProduct = (productId: number) => {
 		if (confirm(`Are you sure you want to delete the product #${productId}?`)) {
 			axios.delete(`${apiRoot}/${productId}`)
-				.then(fetchProducts);
+				.then(fetchProducts)
+				.catch(error => showToast(error.response.data.message, true));
 		}
 	};
 
