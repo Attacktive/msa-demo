@@ -41,13 +41,15 @@
 	const editProduct = () => {
 		axios.put(`${apiRoot}/${productId}`, product)
 			.then(() => dispatch("submit"))
-			.then(() => toShow = false);
+			.catch(error => dispatch("notify", error))
+			.finally(() => toShow = false);
 	};
 
 	const removeProduct = () => {
 		axios.delete(`${apiRoot}/${product.id}`)
 			.then(() => dispatch("submit"))
-			.then(() => toShow = false);
+			.catch(error => dispatch("notify", error))
+			.finally(() => toShow = false);
 	};
 
 	$: {

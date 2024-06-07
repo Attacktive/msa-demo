@@ -1,9 +1,21 @@
 <script lang="ts">
-	import type { Product } from "$types/product";
+	import type { NewProduct, Product } from "$types/product";
 	import axios from "axios";
-	import { Breadcrumb, BreadcrumbItem, Button, Table, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from "flowbite-svelte";
+	import { Breadcrumb, BreadcrumbItem, Button, Table, TableBodyCell, TableBodyRow, TableHead, TableHeadCell, Toast } from "flowbite-svelte";
 	import AddProductModal from "$components/products/AddProductModal.svelte";
 	import EditProductModal from "$components/products/EditProductModal.svelte";
+
+	let toShowToast = false;
+	let toastContent = "";
+	const showToast = (content: string, durationInSeconds: number = 5) => {
+		toastContent = content;
+		toShowToast = true;
+		if (durationInSeconds > 0) {
+			setTimeout(() => toShowToast = false, durationInSeconds * 1000);
+		}
+	};
+
+	const notify = (event) => showToast(event.detail);
 
 	const apiRoot = import.meta.env.VITE_PRODUCT_API_ROOT;
 
@@ -23,6 +35,38 @@
 	const showEditProductModal = (productId: number) => {
 		currentProductId = productId;
 		toShowEditProductModal = true;
+	};
+
+	const addTestProducts = () => {
+		const products: NewProduct[] = [
+			{
+				name: "Lenovo Laptop",
+				description: "An awesome Laptop manufactured by Lenovo.",
+				price: 1_234_567,
+				stock: 30
+			},
+			{
+				name: "Monstargear Mechanical Keyboard",
+				description: "A TKL mechanical keyboard which supports Bluetooth connection.",
+				price: 202_020,
+				stock: 23
+			},
+			{
+				name: "Logitech MX Master 3S",
+				description: undefined,
+				price: 123_456,
+				stock: 116
+			},
+			{
+				name: "Apple Magic Trackpad II",
+				description: "Don't bother with the description. 😈",
+				price: 222_222,
+				stock: 8
+			}
+		];
+
+		const requests = products.map(product => axios.post(apiRoot, product))
+		axios.all(requests).then(fetchProducts);
 	};
 
 	const removeProduct = (productId: number) => {
@@ -72,8 +116,12 @@
 		{/if}
 	</div>
 
-	<Button on:click={showAddProductModal}>Add product</Button>
+	<Button class="mx-3" on:click={showAddProductModal}>Add product</Button>
+	<Button class="mx-3" on:click={addTestProducts}>Add test products</Button>
 </div>
 
-<AddProductModal bind:toShow={toShowAddProductModal} on:submit={fetchProducts}/>
-<EditProductModal bind:toShow={toShowEditProductModal} productId={currentProductId} on:submit={fetchProducts}/>
+<AddProductModal bind:toShow={toShowAddProductModal} on:submit={fetchProducts} on:notify/>
+<EditProductModal bind:toShow={toShowEditProductModal} productId={currentProductId} on:submit={fetchProducts} on:notify/>
+<Toast bind:open={toShowToast}>
+	{toastContent}
+</Toast>

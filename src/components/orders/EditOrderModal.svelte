@@ -55,13 +55,15 @@
 	const editOrder = () => {
 		axios.put(`${orderApiRoot}/${orderId}`, order)
 			.then(() => dispatch("submit"))
-			.then(() => toShow = false);
+			.catch(error => dispatch("notify", error))
+			.finally(() => toShow = false);
 	};
 
 	const removeProduct = () => {
 		axios.delete(`${orderApiRoot}/${orderId}`)
 			.then(() => dispatch("submit"))
-			.then(() => toShow = false);
+			.catch(error => dispatch("notify", error))
+			.finally(() => toShow = false);
 	};
 
 	$: {

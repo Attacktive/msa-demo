@@ -1,17 +1,31 @@
 <script lang="ts">
-	import type { InboundOrder } from "$types/order";
+	import type { Product } from "$types/product";
+	import type { InboundOrder, NewOrder } from "$types/order";
 	import axios from "axios";
-	import { Breadcrumb, BreadcrumbItem, Button, Table, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from "flowbite-svelte";
+	import { Breadcrumb, BreadcrumbItem, Button, Table, TableBodyCell, TableBodyRow, TableHead, TableHeadCell, Toast } from "flowbite-svelte";
 	import OrderProductModal from "$components/orders/OrderProductModal.svelte";
 	import EditOrderModal from "$components/orders/EditOrderModal.svelte";
 
-	const apiRoot = import.meta.env.VITE_ORDER_API_ROOT;
+	let toShowToast = false;
+	let toastContent = "";
+	const showToast = (content: string, durationInSeconds: number = 5) => {
+		toastContent = content;
+		toShowToast = true;
+		if (durationInSeconds > 0) {
+			setTimeout(() => toShowToast = false, durationInSeconds * 1000);
+		}
+	};
+
+	const notify = (event) => showToast(event.detail);
+
+	const productApiRoot = import.meta.env.VITE_PRODUCT_API_ROOT;
+	const orderApiRoot = import.meta.env.VITE_ORDER_API_ROOT;
 
 	let orders: InboundOrder[] = [];
 	let currentOrderId: number | undefined;
 
 	const fetchOrders = async () => {
-		const { data } = await axios.get<InboundOrder[]>(apiRoot);
+		const { data } = await axios.get<InboundOrder[]>(orderApiRoot);
 
 		orders = data;
 	};
@@ -25,8 +39,32 @@
 		toShowEditOrderModal = true;
 	}
 
+	const addTestOrders = async () => {
+		const { data } = await axios.get<Product[]>(productApiRoot);
+		if (data.length) {
+			const orders: NewOrder[] = [
+				{
+					productId: data[0].id,
+					quantity: data[0].stock / 2
+				}
+			];
+
+			if (data.length > 1) {
+				orders.push({
+					productId: data[1].id,
+					quantity: data[1].stock / 3
+				});
+			}
+
+			const requests = orders.map(order => axios.post(orderApiRoot, order));
+			axios.all(requests).then(fetchOrders);
+		} else {
+			showToast("No product is available now. 😞");
+		}
+	};
+
 	const removeOrder = (orderId: number) => {
-		axios.delete(`${apiRoot}/${orderId}`)
+		axios.delete(`${orderApiRoot}/${orderId}`)
 			.then(fetchOrders);
 	}
 
@@ -72,8 +110,12 @@
 		{/if}
 	</div>
 
-	<Button on:click={showOrderProductModal}>Order product</Button>
+	<Button class="mx-3" on:click={showOrderProductModal}>Order product</Button>
+	<Button class="mx-3" on:click={addTestOrders}>Add test orders</Button>
 </div>
 
-<OrderProductModal bind:toShow={toShowOrderProductModal} on:submit={fetchOrders}/>
-<EditOrderModal bind:toShow={toShowEditOrderModal} orderId={currentOrderId} on:submit={fetchOrders}/>
+<OrderProductModal bind:toShow={toShowOrderProductModal} on:submit={fetchOrders} on:notify/>
+<EditOrderModal bind:toShow={toShowEditOrderModal} orderId={currentOrderId} on:submit={fetchOrders} on:notify/>
+<Toast bind:open={toShowToast}>
+	{toastContent}
+</Toast>

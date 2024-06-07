@@ -28,7 +28,8 @@
 	const addProduct = () => {
 		axios.post(apiRoot, newProduct)
 			.then(() => dispatch("submit"))
-			.then(() => toShow = false);
+			.catch(error => dispatch("notify", error))
+			.finally(() => toShow = false);
 	};
 
 	onDestroy(clearData);

@@ -1,6 +1,6 @@
 export interface NewProduct {
 	name: string;
-	description: string;
+	description?: string;
 	price: number;
 	stock: number;
 }

@@ -37,7 +37,8 @@
 	const orderProduct = () => {
 		axios.post(orderApiRoot, newOrder)
 			.then(() => dispatch("submit"))
-			.then(() => toShow = false);
+			.catch(error => dispatch("notify", error))
+			.finally(() => toShow = false);
 	};
 
 	onDestroy(clearData);
