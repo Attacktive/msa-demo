@@ -20,7 +20,7 @@
 
 	const reportError = (event: CustomEvent<Error>) => {
 		if (event.detail instanceof AxiosError && event.detail.response?.data?.message) {
-			showToast(event.detail.response.data.message, true, 0);
+			showToast(event.detail.response.data.message, true);
 		} else {
 			showToast(event.detail.message, true);
 		}
