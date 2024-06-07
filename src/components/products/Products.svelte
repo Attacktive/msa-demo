@@ -79,8 +79,10 @@
 	};
 
 	const removeProduct = (productId: number) => {
-		axios.delete(`${apiRoot}/${productId}`)
-			.then(fetchProducts);
+		if (confirm(`Are you sure you want to delete the product #${productId}?`)) {
+			axios.delete(`${apiRoot}/${productId}`)
+				.then(fetchProducts);
+		}
 	};
 
 	fetchProducts();
