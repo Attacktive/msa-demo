@@ -48,6 +48,10 @@
 		toShowEditOrderModal = true;
 	}
 
+	const generateRandomInteger = (minimum: number, maximum: number) => {
+		return Math.floor(Math.random() * (maximum - minimum) + minimum);
+	}
+
 	const addTestOrders = async () => {
 		const { data } = await axios.get<Product[]>(productApiRoot);
 		if (data.length) {
@@ -59,9 +63,11 @@
 			];
 
 			if (data.length > 1) {
+				const randomIndex = generateRandomInteger(1, data.length);
+
 				orders.push({
-					productId: data[1].id,
-					quantity: data[1].stock / 3
+					productId: data[randomIndex].id,
+					quantity: data[randomIndex].stock / 3
 				});
 			}
 
