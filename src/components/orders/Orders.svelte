@@ -73,8 +73,10 @@
 	};
 
 	const removeOrder = (orderId: number) => {
-		axios.delete(`${orderApiRoot}/${orderId}`)
-			.then(fetchOrders);
+		if (confirm(`Are you sure you want to delete the order #${orderId}?`)) {
+			axios.delete(`${orderApiRoot}/${orderId}`)
+				.then(fetchOrders);
+		}
 	}
 
 	fetchOrders();
