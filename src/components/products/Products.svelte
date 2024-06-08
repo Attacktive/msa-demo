@@ -24,7 +24,7 @@
 		} else {
 			showToast(event.detail.message, true);
 		}
-	}
+	};
 
 	const apiRoot = import.meta.env.VITE_PRODUCT_API_ROOT;
 
@@ -32,9 +32,19 @@
 	let currentProductId: number | undefined;
 
 	const fetchProducts = async () => {
-		const { data } = await axios.get<Product[]>(apiRoot);
+		try {
+			const { data } = await axios.get<Product[]>(apiRoot);
 
-		products = data;
+			products = data;
+		} catch (error) {
+			if (error instanceof AxiosError && error.response?.data.message) {
+				showToast(error.response.data.message, true);
+			} else if (error instanceof Error) {
+				showToast(error.message, true);
+			} else {
+				console.error(error);
+			}
+		}
 	};
 
 	let toShowAddProductModal = false;
@@ -74,7 +84,7 @@
 			}
 		];
 
-		const requests = products.map(product => axios.post(apiRoot, product))
+		const requests = products.map(product => axios.post(apiRoot, product));
 		axios.all(requests)
 			.then(fetchProducts)
 			.catch(error => showToast(error.response.data.message, true));

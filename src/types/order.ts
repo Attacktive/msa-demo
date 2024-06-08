@@ -11,6 +11,6 @@ export interface NewOrder {
 	quantity: number;
 }
 
-export interface Order extends NewOrder{
+export interface Order extends NewOrder {
 	id: number;
 }

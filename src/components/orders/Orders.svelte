@@ -25,7 +25,7 @@
 		} else {
 			showToast(event.detail.message, true);
 		}
-	}
+	};
 
 	const productApiRoot = import.meta.env.VITE_PRODUCT_API_ROOT;
 	const orderApiRoot = import.meta.env.VITE_ORDER_API_ROOT;
@@ -34,9 +34,19 @@
 	let currentOrderId: number | undefined;
 
 	const fetchOrders = async () => {
-		const { data } = await axios.get<InboundOrder[]>(orderApiRoot);
+		try {
+			const { data } = await axios.get<InboundOrder[]>(orderApiRoot);
 
-		orders = data;
+			orders = data;
+		} catch (error) {
+			if (error instanceof AxiosError && error.response?.data.message) {
+				showToast(error.response.data.message, true);
+			} else if (error instanceof Error) {
+				showToast(error.message, true);
+			} else {
+				console.error(error);
+			}
+		}
 	};
 
 	let toShowOrderProductModal = false;
@@ -46,11 +56,11 @@
 	const showEditOrderModal = (orderId: number) => {
 		currentOrderId = orderId;
 		toShowEditOrderModal = true;
-	}
+	};
 
 	const generateRandomInteger = (minimum: number, maximum: number) => {
 		return Math.floor(Math.random() * (maximum - minimum) + minimum);
-	}
+	};
 
 	const addTestOrders = async () => {
 		try {
@@ -81,7 +91,7 @@
 			if (error instanceof AxiosError && error.response?.data.message) {
 				showToast(error.response.data.message, true);
 			} else if (error instanceof Error) {
-				showToast(error.message);
+				showToast(error.message, true);
 			} else {
 				console.error(error);
 			}
@@ -94,7 +104,7 @@
 				.then(fetchOrders)
 				.catch(error => showToast(error.response.data.message, true));
 		}
-	}
+	};
 
 	fetchOrders();
 </script>

@@ -1,14 +1,16 @@
 <script lang="ts">
+	import type { SelectOptionType } from "flowbite-svelte";
+	import { Button, Checkbox, Label, Modal, NumberInput, Select, Tooltip } from "flowbite-svelte";
 	import type { Product } from "$types/product";
 	import type { NewOrder } from "$types/order";
-	import type { SelectOptionType } from "flowbite-svelte";
 	import { createEventDispatcher, onDestroy } from "svelte";
 	import axios from "axios";
-	import { Button, Label, Modal, NumberInput, Select } from "flowbite-svelte";
 
 	export let toShow = false;
 
 	const dispatch = createEventDispatcher();
+
+	let toEnableDoubleOrdering = false;
 
 	let newOrder: NewOrder = {
 		productId: 0,
@@ -35,9 +37,14 @@
 
 	const orderApiRoot = import.meta.env.VITE_ORDER_API_ROOT;
 	const orderProduct = () => {
-		axios.post(orderApiRoot, newOrder)
-			.then(() => dispatch("submit"))
+		const requests = [axios.post(orderApiRoot, newOrder)];
+		if (toEnableDoubleOrdering) {
+			requests.push(axios.post(orderApiRoot, newOrder));
+		}
+
+		axios.all(requests)
 			.catch(error => dispatch("report-error", error))
+			.finally(() => dispatch("submit"))
 			.finally(() => toShow = false);
 	};
 
@@ -56,6 +63,10 @@
 		<NumberInput id="quantity" placeholder="Quantity" bind:value={newOrder.quantity}/>
 	</div>
 	<div class="flex flex-row-reverse">
-		<Button class="mt-3" on:click={orderProduct}>Add</Button>
+		<Button class="mt-3 mx-3" on:click={orderProduct}>Add</Button>
+		<div class="mx-3">
+			<Checkbox bind:checked={toEnableDoubleOrdering}>Double Ordering (debugging ☠)</Checkbox>
+			<Tooltip>Ordering request is going to be sent TWICE.</Tooltip>
+		</div>
 	</div>
 </Modal>
