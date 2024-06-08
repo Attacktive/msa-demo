@@ -2,7 +2,7 @@
 	import type { Product } from "$types/product";
 	import type { InboundOrder, Order } from "$types/order";
 	import type { SelectOptionType } from "flowbite-svelte";
-	import { Button, Label, Modal, NumberInput, Select, Spinner } from "flowbite-svelte";
+	import { Button, Label, Modal, NumberInput, Select } from "flowbite-svelte";
 	import { createEventDispatcher, onDestroy } from "svelte";
 	import axios from "axios";
 
@@ -38,18 +38,18 @@
 
 	const orderApiRoot = import.meta.env.VITE_ORDER_API_ROOT;
 
-	let toShowSpinner = false;
 	const fetchOrder = async () => {
-		toShowSpinner = true;
-		const { data } = await axios.get<InboundOrder>(`${orderApiRoot}/${orderId}`);
+		try {
+			const { data } = await axios.get<InboundOrder>(`${orderApiRoot}/${orderId}`);
 
-		order = {
-			id: data.id,
-			productId: data.product.id,
-			quantity: data.quantity
-		};
-
-		toShowSpinner = false;
+			order = {
+				id: data.id,
+				productId: data.product.id,
+				quantity: data.quantity
+			};
+		} catch(error) {
+			dispatch("report-error", error);
+		}
 	};
 
 	const editOrder = () => {
@@ -75,10 +75,6 @@
 
 	onDestroy(clearData);
 </script>
-
-{#if toShowSpinner}
-	<Spinner />
-{/if}
 
 <Modal title="Add product" autoclose bind:open={toShow}>
 	<div>

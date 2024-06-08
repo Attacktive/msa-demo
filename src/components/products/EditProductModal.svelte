@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Product } from "$types/product";
 	import { createEventDispatcher, onDestroy } from "svelte";
-	import { Button, Input, Label, Modal, NumberInput, Spinner } from "flowbite-svelte";
+	import { Button, Input, Label, Modal, NumberInput } from "flowbite-svelte";
 	import axios from "axios";
 
 	export let toShow = false;
@@ -29,13 +29,14 @@
 
 	const apiRoot = import.meta.env.VITE_PRODUCT_API_ROOT;
 
-	let toShowSpinner = false;
 	const fetchProduct = async () => {
-		toShowSpinner = true;
-		const { data } = await axios.get<Product>(`${apiRoot}/${productId}`);
+		try {
+			const { data } = await axios.get<Product>(`${apiRoot}/${productId}`);
 
-		product = data;
-		toShowSpinner = false;
+			product = data;
+		} catch (error) {
+			dispatch("report-error", error);
+		}
 	};
 
 	const editProduct = () => {
@@ -60,10 +61,6 @@
 
 	onDestroy(clearData);
 </script>
-
-{#if toShowSpinner}
-	<Spinner />
-{/if}
 
 <Modal title="Add product" autoclose bind:open={toShow}>
 	<div>
