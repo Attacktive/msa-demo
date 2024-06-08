@@ -1,11 +1,18 @@
 <script lang="ts">
 	import type { Product } from "$types/product";
-	import type { InboundOrder, NewOrder } from "$types/order";
-	import axios, { AxiosError } from "axios";
+	import type { InboundOrder } from "$types/order";
+	import axios from "axios";
+	import { useErrorHelper } from "$utils/error";
+	import { useFormatter } from "$utils/format";
+	import { useDummyData } from "$utils/dummy";
 	import { Breadcrumb, BreadcrumbItem, Button, Table, TableBodyCell, TableBodyRow, TableHead, TableHeadCell, Toast } from "flowbite-svelte";
 	import { BellRingSolid } from "flowbite-svelte-icons";
 	import OrderProductModal from "$components/orders/OrderProductModal.svelte";
 	import EditOrderModal from "$components/orders/EditOrderModal.svelte";
+
+	const { getErrorMessage } = useErrorHelper();
+	const { formatCount } = useFormatter();
+	const { generateDummyOrders } = useDummyData();
 
 	let toShowToast = false;
 	let toShowToastIcon = false;
@@ -20,11 +27,7 @@
 	};
 
 	const reportError = (event: CustomEvent<Error>) => {
-		if (event.detail instanceof AxiosError && event.detail.response?.data?.message) {
-			showToast(event.detail.response.data.message, true);
-		} else {
-			showToast(event.detail.message, true);
-		}
+		showToast(getErrorMessage(event.detail), true);
 	};
 
 	const productApiRoot = import.meta.env.VITE_PRODUCT_API_ROOT;
@@ -39,13 +42,7 @@
 
 			orders = data;
 		} catch (error) {
-			if (error instanceof AxiosError && error.response?.data.message) {
-				showToast(error.response.data.message, true);
-			} else if (error instanceof Error) {
-				showToast(error.message, true);
-			} else {
-				console.error(error);
-			}
+			showToast(getErrorMessage(error), true);
 		}
 	};
 
@@ -66,35 +63,15 @@
 		try {
 			const { data } = await axios.get<Product[]>(productApiRoot);
 			if (data.length) {
-				const orders: NewOrder[] = [
-					{
-						productId: data[0].id,
-						quantity: data[0].stock / 2
-					}
-				];
-
-				if (data.length > 1) {
-					const randomIndex = generateRandomInteger(1, data.length);
-
-					orders.push({
-						productId: data[randomIndex].id,
-						quantity: data[randomIndex].stock / 3
-					});
-				}
+				const orders = generateDummyOrders(data);
 
 				const requests = orders.map(order => axios.post(orderApiRoot, order));
 				axios.all(requests).then(fetchOrders);
 			} else {
-				showToast("No product is available now. 😞");
+				showToast("No product is available now. 😞", true);
 			}
 		} catch (error) {
-			if (error instanceof AxiosError && error.response?.data.message) {
-				showToast(error.response.data.message, true);
-			} else if (error instanceof Error) {
-				showToast(error.message, true);
-			} else {
-				console.error(error);
-			}
+			showToast(getErrorMessage(error), true);
 		}
 	};
 
@@ -135,7 +112,7 @@
 						<TableBodyCell>{order.id}</TableBodyCell>
 						<TableBodyCell>{order.product.id}</TableBodyCell>
 						<TableBodyCell>{order.product.name}</TableBodyCell>
-						<TableBodyCell>{order.quantity}</TableBodyCell>
+						<TableBodyCell>{formatCount(order.quantity)}</TableBodyCell>
 						<TableBodyCell>
 							<Button on:click={() => showEditOrderModal(order.id)}>Edit</Button>
 						</TableBodyCell>
