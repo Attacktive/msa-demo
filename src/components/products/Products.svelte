@@ -1,10 +1,17 @@
 <script lang="ts">
-	import type { NewProduct, Product } from "$types/product";
-	import axios, { AxiosError } from "axios";
+	import type { Product } from "$types/product";
+	import axios from "axios";
+	import { useErrorHelper } from "$utils/error";
+	import { useFormatter } from "$utils/format";
+	import { useDummyData } from "$utils/dummy";
 	import { Breadcrumb, BreadcrumbItem, Button, Table, TableBodyCell, TableBodyRow, TableHead, TableHeadCell, Toast } from "flowbite-svelte";
 	import { BellRingSolid } from "flowbite-svelte-icons";
 	import AddProductModal from "$components/products/AddProductModal.svelte";
 	import EditProductModal from "$components/products/EditProductModal.svelte";
+
+	const { getErrorMessage } = useErrorHelper();
+	const { formatCount, formatCurrency } = useFormatter();
+	const { generateDummyProducts } = useDummyData();
 
 	let toShowToast = false;
 	let toShowToastIcon = false;
@@ -19,11 +26,7 @@
 	};
 
 	const reportError = (event: CustomEvent<Error>) => {
-		if (event.detail instanceof AxiosError && event.detail.response?.data?.message) {
-			showToast(event.detail.response.data.message, true);
-		} else {
-			showToast(event.detail.message, true);
-		}
+		showToast(getErrorMessage(event.detail), true);
 	};
 
 	const apiRoot = import.meta.env.VITE_PRODUCT_API_ROOT;
@@ -37,13 +40,7 @@
 
 			products = data;
 		} catch (error) {
-			if (error instanceof AxiosError && error.response?.data.message) {
-				showToast(error.response.data.message, true);
-			} else if (error instanceof Error) {
-				showToast(error.message, true);
-			} else {
-				console.error(error);
-			}
+			showToast(getErrorMessage(error), true);
 		}
 	};
 
@@ -57,34 +54,9 @@
 	};
 
 	const addTestProducts = () => {
-		const products: NewProduct[] = [
-			{
-				name: "Lenovo Laptop",
-				description: "An awesome Laptop manufactured by Lenovo.",
-				price: 1_234_567,
-				stock: 30
-			},
-			{
-				name: "Monstargear Mechanical Keyboard",
-				description: "A TKL mechanical keyboard which supports Bluetooth connection.",
-				price: 202_020,
-				stock: 23
-			},
-			{
-				name: "Logitech MX Master 3S",
-				description: undefined,
-				price: 123_456,
-				stock: 116
-			},
-			{
-				name: "Apple Magic Trackpad II",
-				description: "Don't bother with the description. 😈",
-				price: 222_222,
-				stock: 8
-			}
-		];
+		const dummyProducts = generateDummyProducts();
 
-		const requests = products.map(product => axios.post(apiRoot, product));
+		const requests = dummyProducts.map(product => axios.post(apiRoot, product));
 		axios.all(requests)
 			.then(fetchProducts)
 			.catch(error => showToast(error.response.data.message, true));
@@ -126,8 +98,8 @@
 					<TableBodyRow>
 						<TableBodyCell>{product.id}</TableBodyCell>
 						<TableBodyCell>{product.name}</TableBodyCell>
-						<TableBodyCell>{product.price}</TableBodyCell>
-						<TableBodyCell>{product.stock}</TableBodyCell>
+						<TableBodyCell>{formatCurrency(product.price)}</TableBodyCell>
+						<TableBodyCell>{formatCount(product.stock)}</TableBodyCell>
 						<TableBodyCell>
 							<Button on:click={() => showEditProductModal(product.id)}>Edit</Button>
 						</TableBodyCell>
