@@ -27,8 +27,8 @@
 	const apiRoot = import.meta.env.VITE_PRODUCT_API_ROOT;
 	const addProduct = () => {
 		axios.post(apiRoot, newProduct)
-			.then(() => dispatch("submit"))
 			.catch(error => dispatch("report-error", error))
+			.finally(() => dispatch("submit"))
 			.finally(() => toShow = false);
 	};
 

@@ -47,22 +47,22 @@
 				productId: data.product.id,
 				quantity: data.quantity
 			};
-		} catch(error) {
+		} catch (error) {
 			dispatch("report-error", error);
 		}
 	};
 
 	const editOrder = () => {
 		axios.put(`${orderApiRoot}/${orderId}`, order)
-			.then(() => dispatch("submit"))
 			.catch(error => dispatch("report-error", error))
+			.finally(() => dispatch("submit"))
 			.finally(() => toShow = false);
 	};
 
 	const removeProduct = () => {
 		axios.delete(`${orderApiRoot}/${orderId}`)
-			.then(() => dispatch("submit"))
 			.catch(error => dispatch("report-error", error))
+			.finally(() => dispatch("submit"))
 			.finally(() => toShow = false);
 	};
 
