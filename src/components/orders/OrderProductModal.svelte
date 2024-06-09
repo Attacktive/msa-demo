@@ -62,8 +62,8 @@
 		<Label for="quantity">Quantity</Label>
 		<NumberInput id="quantity" placeholder="Quantity" bind:value={newOrder.quantity}/>
 	</div>
-	<div class="flex flex-row-reverse">
-		<Button class="mt-3 mx-3" on:click={orderProduct}>Add</Button>
+	<div class="flex flex-row-reverse py-3">
+		<Button class="mx-3" on:click={orderProduct}>Add</Button>
 		<div class="mx-3">
 			<Checkbox bind:checked={toEnableDoubleOrdering}>Double Ordering (debugging ☠)</Checkbox>
 			<Tooltip>Ordering request is going to be sent TWICE.</Tooltip>
