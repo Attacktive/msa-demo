@@ -3,7 +3,7 @@
 	import type { InboundOrder, Order } from "$types/order";
 	import type { SelectOptionType } from "flowbite-svelte";
 	import { Button, Label, Modal, NumberInput, Select } from "flowbite-svelte";
-	import { createEventDispatcher, onDestroy } from "svelte";
+	import { createEventDispatcher } from "svelte";
 	import axios from "axios";
 
 	export let toShow = false;
@@ -70,10 +70,10 @@
 		if (toShow === true) {
 			fetchOrder();
 			fetchProducts();
+		} else {
+			clearData();
 		}
 	}
-
-	onDestroy(clearData);
 </script>
 
 <Modal title="Add product" autoclose bind:open={toShow}>

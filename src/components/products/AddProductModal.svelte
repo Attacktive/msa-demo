@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { NewProduct } from "$types/product";
 	import { Button, Input, Label, Modal, NumberInput } from "flowbite-svelte";
-	import { createEventDispatcher, onDestroy } from "svelte";
+	import { createEventDispatcher } from "svelte";
 	import axios from "axios";
 
 	export let toShow = false;
@@ -32,7 +32,11 @@
 			.finally(() => toShow = false);
 	};
 
-	onDestroy(clearData);
+	$: {
+		if (toShow === false) {
+			clearData();
+		}
+	}
 </script>
 
 <Modal title="Add product" autoclose bind:open={toShow}>

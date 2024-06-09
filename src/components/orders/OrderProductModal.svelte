@@ -3,7 +3,7 @@
 	import { Button, Checkbox, Label, Modal, NumberInput, Select, Tooltip } from "flowbite-svelte";
 	import type { Product } from "$types/product";
 	import type { NewOrder } from "$types/order";
-	import { createEventDispatcher, onDestroy } from "svelte";
+	import { createEventDispatcher } from "svelte";
 	import axios from "axios";
 
 	export let toShow = false;
@@ -48,7 +48,11 @@
 			.finally(() => toShow = false);
 	};
 
-	onDestroy(clearData);
+	$: {
+		if (toShow === false) {
+			clearData();
+		}
+	}
 
 	fetchProducts();
 </script>
