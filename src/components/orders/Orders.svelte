@@ -11,7 +11,7 @@
 	import EditOrderModal from "$components/orders/EditOrderModal.svelte";
 
 	const { getErrorMessage } = useErrorHelper();
-	const { formatCount } = useFormatter();
+	const { formatCount, formatCurrency } = useFormatter();
 	const { generateDummyOrders } = useDummyData();
 
 	let toShowToast = false;
@@ -96,10 +96,12 @@
 		{#if orders.length > 0}
 			<Table>
 				<TableHead>
-					<TableHeadCell>ID</TableHeadCell>
+					<TableHeadCell>Order ID</TableHeadCell>
 					<TableHeadCell>Product ID</TableHeadCell>
 					<TableHeadCell>Product Name</TableHeadCell>
 					<TableHeadCell>Product Quantity</TableHeadCell>
+					<TableHeadCell>Product Unit Price</TableHeadCell>
+					<TableHeadCell>Total Price</TableHeadCell>
 					<TableHeadCell>
 						<span class="sr-only">Edit</span>
 					</TableHeadCell>
@@ -113,6 +115,8 @@
 						<TableBodyCell>{order.product.id}</TableBodyCell>
 						<TableBodyCell>{order.product.name}</TableBodyCell>
 						<TableBodyCell>{formatCount(order.quantity)}</TableBodyCell>
+						<TableBodyCell>{formatCurrency(order.product.price)}</TableBodyCell>
+						<TableBodyCell>{formatCurrency(order.quantity * order.product.price)}</TableBodyCell>
 						<TableBodyCell>
 							<Button on:click={() => showEditOrderModal(order.id)}>Edit</Button>
 						</TableBodyCell>
