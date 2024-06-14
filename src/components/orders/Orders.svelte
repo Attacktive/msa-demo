@@ -55,10 +55,6 @@
 		toShowEditOrderModal = true;
 	};
 
-	const generateRandomInteger = (minimum: number, maximum: number) => {
-		return Math.floor(Math.random() * (maximum - minimum) + minimum);
-	};
-
 	const addTestOrders = async () => {
 		try {
 			const { data } = await axios.get<Product[]>(productApiRoot);
