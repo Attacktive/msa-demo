@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { run } from 'svelte/legacy';
-
 	import type { Product } from "$types/product";
 	import type { InboundOrder, Order } from "$types/order";
 	import type { SelectOptionType } from "flowbite-svelte";
@@ -72,7 +70,7 @@
 			.finally(() => toShow = false);
 	};
 
-	run(() => {
+	$effect(() => {
 		if (toShow === true) {
 			fetchOrder();
 			fetchProducts();
