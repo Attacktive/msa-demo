@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { run } from 'svelte/legacy';
+
 	import type { Product } from "$types/product";
 	import type { InboundOrder, Order } from "$types/order";
 	import type { SelectOptionType } from "flowbite-svelte";
@@ -6,16 +8,20 @@
 	import { createEventDispatcher } from "svelte";
 	import axios from "axios";
 
-	export let toShow = false;
-	export let orderId: number | undefined;
+	interface Props {
+		toShow?: boolean;
+		orderId: number | undefined;
+	}
+
+	let { toShow = $bindable(false), orderId }: Props = $props();
 
 	const dispatch = createEventDispatcher();
 
-	let order: Order = {
+	let order: Order = $state({
 		id: 0,
 		productId: 0,
 		quantity: 0
-	};
+	});
 
 	const clearData = () => {
 		order = {
@@ -25,7 +31,7 @@
 		};
 	};
 
-	let productOptions: SelectOptionType<number>[] = [];
+	let productOptions: SelectOptionType<number>[] = $state([]);
 	const productApiRoot = import.meta.env.VITE_PRODUCT_API_ROOT;
 	const fetchProducts = async () => {
 		const { data } = await axios.get<Product[]>(productApiRoot);
@@ -66,14 +72,14 @@
 			.finally(() => toShow = false);
 	};
 
-	$: {
+	run(() => {
 		if (toShow === true) {
 			fetchOrder();
 			fetchProducts();
 		} else {
 			clearData();
 		}
-	}
+	});
 </script>
 
 <Modal title="Add product" autoclose bind:open={toShow}>

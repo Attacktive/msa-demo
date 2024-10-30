@@ -1,19 +1,25 @@
 <script lang="ts">
+	import { run } from 'svelte/legacy';
+
 	import type { NewProduct } from "$types/product";
 	import { Button, Input, Label, Modal, NumberInput } from "flowbite-svelte";
 	import { createEventDispatcher } from "svelte";
 	import axios from "axios";
 
-	export let toShow = false;
+	interface Props {
+		toShow?: boolean;
+	}
+
+	let { toShow = $bindable(false) }: Props = $props();
 
 	const dispatch = createEventDispatcher();
 
-	let newProduct: NewProduct = {
+	let newProduct: NewProduct = $state({
 		name: "",
 		description: "",
 		price: 0,
 		stock: 0
-	};
+	});
 
 	const clearData = () => {
 		newProduct = {
@@ -32,11 +38,11 @@
 			.finally(() => toShow = false);
 	};
 
-	$: {
+	run(() => {
 		if (toShow === false) {
 			clearData();
 		}
-	}
+	});
 </script>
 
 <Modal title="Add product" autoclose bind:open={toShow}>
