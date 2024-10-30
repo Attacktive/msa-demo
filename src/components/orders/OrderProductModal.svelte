@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { run } from 'svelte/legacy';
+
 	import type { SelectOptionType } from "flowbite-svelte";
 	import { Button, Checkbox, Label, Modal, NumberInput, Select, Tooltip } from "flowbite-svelte";
 	import type { Product } from "$types/product";
@@ -6,16 +8,20 @@
 	import { createEventDispatcher } from "svelte";
 	import axios from "axios";
 
-	export let toShow = false;
+	interface Props {
+		toShow?: boolean;
+	}
+
+	let { toShow = $bindable(false) }: Props = $props();
 
 	const dispatch = createEventDispatcher();
 
-	let toEnableDoubleOrdering = false;
+	let toEnableDoubleOrdering = $state(false);
 
-	let newOrder: NewOrder = {
+	let newOrder: NewOrder = $state({
 		productId: 0,
 		quantity: 0
-	};
+	});
 
 	const clearData = () => {
 		newOrder = {
@@ -24,7 +30,7 @@
 		};
 	};
 
-	let productOptions: SelectOptionType<number>[] = [];
+	let productOptions: SelectOptionType<number>[] = $state([]);
 	const productApiRoot = import.meta.env.VITE_PRODUCT_API_ROOT;
 	const fetchProducts = async () => {
 		const { data } = await axios.get<Product[]>(productApiRoot);
@@ -48,11 +54,11 @@
 			.finally(() => toShow = false);
 	};
 
-	$: {
+	run(() => {
 		if (toShow === false) {
 			clearData();
 		}
-	}
+	});
 
 	fetchProducts();
 </script>
