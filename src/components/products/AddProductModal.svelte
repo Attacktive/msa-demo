@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { run } from 'svelte/legacy';
-
 	import type { NewProduct } from "$types/product";
 	import { Button, Input, Label, Modal, NumberInput } from "flowbite-svelte";
 	import { createEventDispatcher } from "svelte";
@@ -38,7 +36,7 @@
 			.finally(() => toShow = false);
 	};
 
-	run(() => {
+	$effect(() => {
 		if (toShow === false) {
 			clearData();
 		}

@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { run } from 'svelte/legacy';
-
 	import type { SelectOptionType } from "flowbite-svelte";
 	import { Button, Checkbox, Label, Modal, NumberInput, Select, Tooltip } from "flowbite-svelte";
 	import type { Product } from "$types/product";
@@ -54,7 +52,7 @@
 			.finally(() => toShow = false);
 	};
 
-	run(() => {
+	$effect(() => {
 		if (toShow === false) {
 			clearData();
 		}

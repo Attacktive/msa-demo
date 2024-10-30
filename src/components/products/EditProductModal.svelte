@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { run } from 'svelte/legacy';
-
 	import type { Product } from "$types/product";
 	import { createEventDispatcher } from "svelte";
 	import { Button, Input, Label, Modal, NumberInput } from "flowbite-svelte";
@@ -59,7 +57,7 @@
 			.finally(() => toShow = false);
 	};
 
-	run(() => {
+	$effect(() => {
 		if (toShow === true) {
 			fetchProduct();
 		} else {
