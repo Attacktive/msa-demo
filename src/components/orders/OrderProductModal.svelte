@@ -3,16 +3,15 @@
 	import { Button, Checkbox, Label, Modal, NumberInput, Select, Tooltip } from "flowbite-svelte";
 	import type { Product } from "$types/product";
 	import type { NewOrder } from "$types/order";
-	import { createEventDispatcher } from "svelte";
 	import axios from "axios";
 
 	interface Props {
 		toShow?: boolean;
+		submit: Promise<() => void>;
+		reportError: (event: CustomEvent<Error>) => void;
 	}
 
-	let { toShow = $bindable(false) }: Props = $props();
-
-	const dispatch = createEventDispatcher();
+	let { toShow = $bindable(false), submit, reportError }: Props = $props();
 
 	let toEnableDoubleOrdering = $state(false);
 
@@ -47,8 +46,8 @@
 		}
 
 		axios.all(requests)
-			.catch(error => dispatch("report-error", error))
-			.finally(() => dispatch("submit"))
+			.catch(reportError)
+			.finally(submit)
 			.finally(() => toShow = false);
 	};
 

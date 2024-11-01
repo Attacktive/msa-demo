@@ -3,17 +3,16 @@
 	import type { InboundOrder, Order } from "$types/order";
 	import type { SelectOptionType } from "flowbite-svelte";
 	import { Button, Label, Modal, NumberInput, Select } from "flowbite-svelte";
-	import { createEventDispatcher } from "svelte";
 	import axios from "axios";
 
 	interface Props {
 		toShow?: boolean;
 		orderId: number | undefined;
+		submit: Promise<() => void>;
+		reportError: (event: CustomEvent<Error>) => void;
 	}
 
-	let { toShow = $bindable(false), orderId }: Props = $props();
-
-	const dispatch = createEventDispatcher();
+	let { toShow = $bindable(false), orderId, submit, reportError }: Props = $props();
 
 	let order: Order = $state({
 		id: 0,
@@ -52,21 +51,21 @@
 				quantity: data.quantity
 			};
 		} catch (error) {
-			dispatch("report-error", error);
+			reportError(error);
 		}
 	};
 
 	const editOrder = () => {
 		axios.put(`${orderApiRoot}/${orderId}`, order)
-			.catch(error => dispatch("report-error", error))
-			.finally(() => dispatch("submit"))
+			.catch(reportError)
+			.finally(submit)
 			.finally(() => toShow = false);
 	};
 
 	const removeProduct = () => {
 		axios.delete(`${orderApiRoot}/${orderId}`)
-			.catch(error => dispatch("report-error", error))
-			.finally(() => dispatch("submit"))
+			.catch(reportError)
+			.finally(submit)
 			.finally(() => toShow = false);
 	};
 

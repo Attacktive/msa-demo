@@ -1,17 +1,16 @@
 <script lang="ts">
 	import type { Product } from "$types/product";
-	import { createEventDispatcher } from "svelte";
 	import { Button, Input, Label, Modal, NumberInput } from "flowbite-svelte";
 	import axios from "axios";
 
 	interface Props {
 		toShow?: boolean;
 		productId: number | undefined;
+		submit: Promise<() => void>;
+		reportError: (event: CustomEvent<Error>) => void;
 	}
 
-	let { toShow = $bindable(false), productId }: Props = $props();
-
-	const dispatch = createEventDispatcher();
+	let { toShow = $bindable(false), productId, submit, reportError }: Props = $props();
 
 	let product: Product = $state({
 		id: 0,
@@ -39,21 +38,21 @@
 
 			product = data;
 		} catch (error) {
-			dispatch("report-error", error);
+			reportError(error);
 		}
 	};
 
 	const editProduct = () => {
 		axios.put(`${apiRoot}/${productId}`, product)
-			.catch(error => dispatch("report-error", error))
-			.finally(() => dispatch("submit"))
+			.catch(reportError)
+			.finally(submit)
 			.finally(() => toShow = false);
 	};
 
 	const removeProduct = () => {
 		axios.delete(`${apiRoot}/${product.id}`)
-			.catch(error => dispatch("report-error", error))
-			.finally(() => dispatch("submit"))
+			.catch(reportError)
+			.finally(submit)
 			.finally(() => toShow = false);
 	};
 
