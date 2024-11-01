@@ -1,4 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: Element with a slot='...' attribute must be a child of a component or a descendant of a custom element -->
 <script lang="ts">
 	import type { Product } from "$types/product";
 	import type { InboundOrder } from "$types/order";
@@ -134,7 +133,9 @@
 <EditOrderModal bind:toShow={toShowEditOrderModal} orderId={currentOrderId} submit={fetchOrders} report-error={reportError}/>
 <Toast class="my-5" bind:open={toShowToast}>
 	{#if toShowToastIcon}
-		<BellRingSolid slot="icon" class="w-12 h-12"/>
+		{#snippet icon()}
+			<BellRingSolid class="w-12 h-12"/>
+		{/snippet}
 	{/if}
 	{toastContent}
 </Toast>
