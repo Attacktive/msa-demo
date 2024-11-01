@@ -130,8 +130,8 @@
 	<Button class="mx-3" on:click={addTestOrders}>Add test orders</Button>
 </div>
 
-<OrderProductModal bind:toShow={toShowOrderProductModal} on:submit={fetchOrders} on:report-error={reportError}/>
-<EditOrderModal bind:toShow={toShowEditOrderModal} orderId={currentOrderId} on:submit={fetchOrders} on:report-error={reportError}/>
+<OrderProductModal bind:toShow={toShowOrderProductModal} submit={fetchOrders} report-error={reportError}/>
+<EditOrderModal bind:toShow={toShowEditOrderModal} orderId={currentOrderId} submit={fetchOrders} report-error={reportError}/>
 <Toast class="my-5" bind:open={toShowToast}>
 	{#if toShowToastIcon}
 		<BellRingSolid slot="icon" class="w-12 h-12"/>

@@ -117,8 +117,8 @@
 	<Button class="mx-3" on:click={addTestProducts}>Add test products</Button>
 </div>
 
-<AddProductModal bind:toShow={toShowAddProductModal} on:submit={fetchProducts} on:report-error={reportError}/>
-<EditProductModal bind:toShow={toShowEditProductModal} productId={currentProductId} on:submit={fetchProducts} on:report-error={reportError}/>
+<AddProductModal bind:toShow={toShowAddProductModal} submit={fetchProducts} report-error={reportError}/>
+<EditProductModal bind:toShow={toShowEditProductModal} productId={currentProductId} submit={fetchProducts} report-error={reportError}/>
 <Toast class="my-5 w-96" bind:open={toShowToast}>
 	{#if toShowToastIcon}
 		<BellRingSolid slot="icon" class="w-12 h-12"/>

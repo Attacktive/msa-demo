@@ -1,16 +1,15 @@
 <script lang="ts">
 	import type { NewProduct } from "$types/product";
 	import { Button, Input, Label, Modal, NumberInput } from "flowbite-svelte";
-	import { createEventDispatcher } from "svelte";
 	import axios from "axios";
 
 	interface Props {
 		toShow?: boolean;
+		submit: Promise<() => void>;
+		reportError: (event: CustomEvent<Error>) => void;
 	}
 
-	let { toShow = $bindable(false) }: Props = $props();
-
-	const dispatch = createEventDispatcher();
+	let { toShow = $bindable(false), submit, reportError }: Props = $props();
 
 	let newProduct: NewProduct = $state({
 		name: "",
@@ -31,8 +30,8 @@
 	const apiRoot = import.meta.env.VITE_PRODUCT_API_ROOT;
 	const addProduct = () => {
 		axios.post(apiRoot, newProduct)
-			.catch(error => dispatch("report-error", error))
-			.finally(() => dispatch("submit"))
+			.catch(reportError)
+			.finally(submit)
 			.finally(() => toShow = false);
 	};
 
