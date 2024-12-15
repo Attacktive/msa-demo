@@ -14,9 +14,9 @@
 	const { formatCount, formatCurrency } = useFormatter();
 	const { generateDummyOrders } = useDummyData();
 
-	let toShowToast = false;
-	let toShowToastIcon = false;
-	let toastContent = "";
+	let toShowToast = $state(false);
+	let toShowToastIcon = $state(false);
+	let toastContent = $state("");
 	const showToast = (content: string, toShowIcon = false, durationInSeconds = 5) => {
 		toShowToastIcon = toShowIcon;
 		toastContent = content;
@@ -33,8 +33,8 @@
 	const productApiRoot = import.meta.env.VITE_PRODUCT_API_ROOT;
 	const orderApiRoot = import.meta.env.VITE_ORDER_API_ROOT;
 
-	let orders: InboundOrder[] = [];
-	let currentOrderId: number | undefined;
+	let orders = $state<InboundOrder[]>([]);
+	let currentOrderId = $state<number>();
 
 	const fetchOrders = async () => {
 		try {
@@ -46,10 +46,10 @@
 		}
 	};
 
-	let toShowOrderProductModal = false;
+	let toShowOrderProductModal = $state(false);
 	const showOrderProductModal = () => toShowOrderProductModal = true;
 
-	let toShowEditOrderModal = false;
+	let toShowEditOrderModal = $state(false);
 	const showEditOrderModal = (orderId: number) => {
 		currentOrderId = orderId;
 		toShowEditOrderModal = true;
@@ -129,13 +129,15 @@
 	<Button class="mx-3" on:click={addTestOrders}>Add test orders</Button>
 </div>
 
-<OrderProductModal bind:toShow={toShowOrderProductModal} submit={fetchOrders} report-error={reportError}/>
-<EditOrderModal bind:toShow={toShowEditOrderModal} orderId={currentOrderId} submit={fetchOrders} report-error={reportError}/>
-<Toast class="my-5" bind:open={toShowToast}>
-	{#if toShowToastIcon}
-		{#snippet icon()}
-			<BellRingSolid class="w-12 h-12"/>
-		{/snippet}
-	{/if}
-	{toastContent}
-</Toast>
+<OrderProductModal bind:toShow={toShowOrderProductModal} submit={fetchOrders} reportError={reportError}/>
+<EditOrderModal bind:toShow={toShowEditOrderModal} orderId={currentOrderId} submit={fetchOrders} reportError={reportError}/>
+{#if toShowToast}
+	<Toast class="my-5">
+		<svelte:fragment slot="icon">
+			{#if toShowToastIcon}
+				<BellRingSolid class="w-12 h-12"/>
+			{/if}
+		</svelte:fragment>
+		{toastContent}
+	</Toast>
+{/if}

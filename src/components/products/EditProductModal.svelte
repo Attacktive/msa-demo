@@ -6,7 +6,7 @@
 	interface Props {
 		toShow?: boolean;
 		productId: number | undefined;
-		submit: Promise<() => void>;
+		submit: () => Promise<void>;
 		reportError: (event: CustomEvent<Error>) => void;
 	}
 
@@ -32,14 +32,10 @@
 
 	const apiRoot = import.meta.env.VITE_PRODUCT_API_ROOT;
 
-	const fetchProduct = async () => {
-		try {
-			const { data } = await axios.get<Product>(`${apiRoot}/${productId}`);
-
-			product = data;
-		} catch (error) {
-			reportError(error);
-		}
+	const fetchProduct = () => {
+		axios.get<Product>(`${apiRoot}/${productId}`)
+			.then(({ data }) => (product = data))
+			.catch(reportError);
 	};
 
 	const editProduct = () => {
