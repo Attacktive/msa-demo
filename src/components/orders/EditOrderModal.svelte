@@ -8,7 +8,7 @@
 	interface Props {
 		toShow?: boolean;
 		orderId: number | undefined;
-		submit: Promise<() => void>;
+		submit: () => Promise<void>;
 		reportError: (event: CustomEvent<Error>) => void;
 	}
 
@@ -41,18 +41,16 @@
 
 	const orderApiRoot = import.meta.env.VITE_ORDER_API_ROOT;
 
-	const fetchOrder = async () => {
-		try {
-			const { data } = await axios.get<InboundOrder>(`${orderApiRoot}/${orderId}`);
-
-			order = {
-				id: data.id,
-				productId: data.product.id,
-				quantity: data.quantity
-			};
-		} catch (error) {
-			reportError(error);
-		}
+	const fetchOrder = () => {
+		axios.get<InboundOrder>(`${orderApiRoot}/${orderId}`)
+			.then(({ data }) => {
+				order = {
+					id: data.id,
+					productId: data.product.id,
+					quantity: data.quantity
+				};
+			})
+			.catch(reportError);
 	};
 
 	const editOrder = () => {

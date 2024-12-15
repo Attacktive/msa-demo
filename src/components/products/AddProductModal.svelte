@@ -5,7 +5,7 @@
 
 	interface Props {
 		toShow?: boolean;
-		submit: Promise<() => void>;
+		submit: () => Promise<void>;
 		reportError: (event: CustomEvent<Error>) => void;
 	}
 

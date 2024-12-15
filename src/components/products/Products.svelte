@@ -13,9 +13,9 @@
 	const { formatCount, formatCurrency } = useFormatter();
 	const { generateDummyProducts } = useDummyData();
 
-	let toShowToast = false;
-	let toShowToastIcon = false;
-	let toastContent = "";
+	let toShowToast = $state(false);
+	let toShowToastIcon = $state(false);
+	let toastContent = $state("");
 	const showToast = (content: string, toShowIcon = false, durationInSeconds = 5) => {
 		toShowToastIcon = toShowIcon;
 		toastContent = content;
@@ -31,8 +31,8 @@
 
 	const apiRoot = import.meta.env.VITE_PRODUCT_API_ROOT;
 
-	let products: Product[] = [];
-	let currentProductId: number | undefined;
+	let products = $state<Product[]>([]);
+	let currentProductId = $state<number>();
 
 	const fetchProducts = async () => {
 		try {
@@ -44,10 +44,10 @@
 		}
 	};
 
-	let toShowAddProductModal = false;
+	let toShowAddProductModal = $state(false);
 	const showAddProductModal = () => toShowAddProductModal = true;
 
-	let toShowEditProductModal = false;
+	let toShowEditProductModal = $state(false);
 	const showEditProductModal = (productId: number) => {
 		currentProductId = productId;
 		toShowEditProductModal = true;
@@ -116,13 +116,15 @@
 	<Button class="mx-3" on:click={addTestProducts}>Add test products</Button>
 </div>
 
-<AddProductModal bind:toShow={toShowAddProductModal} submit={fetchProducts} report-error={reportError}/>
-<EditProductModal bind:toShow={toShowEditProductModal} productId={currentProductId} submit={fetchProducts} report-error={reportError}/>
-<Toast class="my-5 w-96" bind:open={toShowToast}>
-	{#if toShowToastIcon}
-		{#snippet icon()}
-			<BellRingSolid class="w-12 h-12"/>
-		{/snippet}
-	{/if}
-	{toastContent}
-</Toast>
+<AddProductModal bind:toShow={toShowAddProductModal} submit={fetchProducts} reportError={reportError}/>
+<EditProductModal bind:toShow={toShowEditProductModal} productId={currentProductId} submit={fetchProducts} reportError={reportError}/>
+{#if toShowToast}
+	<Toast class="my-5 w-96">
+		<svelte:fragment slot="icon">
+			{#if toShowToastIcon}
+				<BellRingSolid class="w-12 h-12"/>
+			{/if}
+		</svelte:fragment>
+		{toastContent}
+	</Toast>
+{/if}
