@@ -27,7 +27,7 @@
 		"flowbite-svelte": "^0.47.4",
 		"flowbite-svelte-icons": "^2.0.2",
 		"globals": "^15.14.0",
-		"postcss": "^8.5.0",
+		"postcss": "^8.5.1",
 		"postcss-load-config": "^6.0.1",
 		"svelte": "^5.17.4",
 		"svelte-check": "^4.1.4",
